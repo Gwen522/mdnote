@@ -31,9 +31,9 @@ pub enum Commands {
     List {
         #[arg(short, long)]
         tag: Option<String>,
-        #[arg(short, long)]
+        #[arg(long)]
         category: Option<String>,
-        #[arg(short, long)]
+        #[arg(long)]
         date: Option<String>,
         #[arg(long)]
         date_start: Option<String>,
