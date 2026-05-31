@@ -168,9 +168,9 @@ fn format_note_file(metadata: &Metadata, content: &str) -> String {
         let items: Vec<String> = metadata
             .tags
             .iter()
-            .map(|t| format!("  \"{}\"", t.name))
+            .map(|t| format!("\"{}\"", t.name))
             .collect();
-        format!("[\n{}\n]", items.join(",\n"))
+        format!("[{}]", items.join(", "))
     };
 
     let category_str = metadata
