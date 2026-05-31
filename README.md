@@ -1,57 +1,43 @@
-# mdnote — Markdown 笔记管理工具
+# mdnote
 
-一个用 Rust 编写的命令行 Markdown 笔记管理工具，支持笔记的增删改查、标签管理、全文搜索和多格式导出。
+命令行 Markdown 笔记管理工具，Rust 期末大作业。
 
-## 功能特性
+## 能干嘛
 
-- 📝 新建、编辑、删除笔记
-- 📋 按标签/分类/日期筛选笔记
-- 🔍 关键词全文搜索（不区分大小写）
-- 🏷️ 标签管理（添加/移除）
-- 📤 多格式导出（JSON / HTML / 纯文本）
-- 📊 笔记统计信息
-- 💾 自动 YAML front matter 管理
+- 建笔记、删笔记、改笔记
+- 按标签/分类/日期筛选
+- 搜内容（支持正则）
+- 导出成 json/html/txt
+- 看统计信息
 
-## 编译与运行
+## 编译运行
 
-### 环境要求
-
-- Rust 1.70+（推荐最新稳定版）
-- Cargo（随 Rust 一起安装）
-
-### 编译
+需要装好 Rust 和 Cargo，版本没啥特别要求，1.70 以上都行。
 
 ```bash
+# 编译
 cargo build --release
-```
 
-编译后的二进制文件在 `target/release/mdnote`。
-
-### 直接运行
-
-```bash
+# 直接跑
 cargo run -- <命令> [选项]
-```
 
-### 安装到系统
-
-```bash
+# 或者装到系统里，以后直接用 mdnote 命令
 cargo install --path .
 ```
 
-安装后可以直接用 `mdnote` 命令。
+编译完的二进制在 `target/release/mdnote`。
 
-## 使用方法
+## 怎么用
 
-### 新建笔记
+### 建笔记
 
 ```bash
 mdnote new "我的学习笔记"
 ```
 
-会在 `notes/` 目录下创建 `my-learning-note.md` 文件，自动生成 YAML front matter：
+会在 notes/ 目录下生成一个 .md 文件，自带 YAML 头：
 
-```markdown
+```
 ---
 title: "我的学习笔记"
 created: 2026-05-31
@@ -64,84 +50,39 @@ category: null
 ### 列出笔记
 
 ```bash
-# 列出所有笔记
-mdnote list
-
-# 按标签筛选
-mdnote list --tag rust
-
-# 按分类筛选
-mdnote list --category 学习
-
-# 按日期筛选
-mdnote list --date 2026-05-31
+mdnote list                      # 全部
+mdnote list --tag rust           # 按标签
+mdnote list --category 学习      # 按分类
+mdnote list --date 2026-05-31    # 按日期
+mdnote list --date-start 2026-01-01 --date-end 2026-12-31  # 日期范围
 ```
 
-### 搜索笔记
+### 搜内容
 
 ```bash
-mdnote search "关键词"
+mdnote search "关键词"           # 普通搜索，不区分大小写
+mdnote search "pattern" --regex  # 正则搜索
 ```
 
-搜索会同时匹配标题和正文内容，不区分大小写，并显示匹配的行号。
+会匹配标题和正文，显示匹配的行号。
 
-### 查看笔记
+### 其他命令
 
 ```bash
-mdnote show <笔记ID>
+mdnote show <id>                 # 看笔记详情，id 就是文件名去掉.md
+mdnote edit <id>                 # 用编辑器打开（优先vscode，没有就用记事本）
+mdnote delete <id>               # 删笔记
+mdnote tag <id> rust             # 加标签
+mdnote untag <id> rust           # 去标签
+mdnote category <id> 学习        # 设分类
+mdnote stats                     # 看统计
+mdnote export --format json      # 导出所有笔记为json
+mdnote export --format html      # 导出html
+mdnote export --format text      # 导出纯文本
+mdnote export --format json --output backup.json  # 导出到指定文件
 ```
 
-笔记 ID 就是文件名去掉 `.md` 后缀。
-
-### 编辑笔记
-
-```bash
-mdnote edit <笔记ID>
-```
-
-会自动用 VSCode（code）或记事本打开笔记文件，编辑完成后自动更新修改日期。
-
-### 删除笔记
-
-```bash
-mdnote delete <笔记ID>
-```
-
-### 标签管理
-
-```bash
-# 添加标签
-mdnote tag <笔记ID> rust
-
-# 移除标签
-mdnote untag <笔记ID> rust
-```
-
-### 导出笔记
-
-```bash
-# 导出为 JSON 格式
-mdnote export --format json
-
-# 导出为 HTML
-mdnote export --format html
-
-# 导出为纯文本
-mdnote export --format text
-
-# 导出到文件
-mdnote export --format json --output backup.json
-```
-
-### 统计信息
-
-```bash
-mdnote stats
-```
-
-### 指定笔记目录
-
-默认使用当前目录下的 `notes/` 文件夹，可以通过 `--dir` 参数指定：
+默认笔记放在当前目录的 notes/ 下，想换目录用 `--dir`：
 
 ```bash
 mdnote --dir /path/to/notes list
@@ -151,56 +92,48 @@ mdnote --dir /path/to/notes list
 
 ```
 src/
-├── main.rs      # 程序入口
-├── cli.rs       # 命令行参数解析与命令路由
-├── model.rs     # 数据模型（Note, Tag, Metadata, Command, ExportFormat）
-├── storage.rs   # 文件系统读写、YAML front matter 解析
-├── search.rs    # 全文搜索、标签过滤、日期范围筛选
-└── export.rs    # Exportable trait + 多格式导出 + 统计信息
+├── main.rs      # 入口
+├── cli.rs       # 命令行解析和路由
+├── model.rs     # 数据结构定义
+├── storage.rs   # 文件读写、YAML解析
+├── search.rs    # 搜索和过滤
+└── export.rs    # 导出和统计
 ```
 
-## 依赖说明
+## 依赖
 
-| 依赖 | 版本 | 用途 |
-|------|------|------|
-| clap | 4.5 | 命令行参数解析 |
-| serde / serde_json | 1.0 | 序列化/反序列化（JSON 导出） |
-| chrono | 0.4 | 日期时间处理 |
-| regex | 1.10 | 正则表达式搜索 |
-| walkdir | 2.5 | 目录遍历 |
+- clap 4.5 — 命令行参数解析
+- serde / serde_json 1.0 — 序列化，json导出用的
+- chrono 0.4 — 日期处理
+- regex 1.10 — 正则搜索
+- walkdir 2.5 — 遍历目录
 
-## Rust 特性体现
+## Rust 特性
 
-本项目充分体现了 Rust 的核心特性：
+作业要求体现的那些东西：
 
-- **ownership / borrowing**：笔记的加载和搜索大量使用引用传递，避免数据拷贝
-- **struct / enum**：`Note`、`Metadata`、`Tag` 等结构体；`Command`、`ExportFormat`、`StorageError` 等枚举
-- **trait**：`Exportable` trait 定义导出接口，`JsonExporter`/`HtmlExporter`/`TextExporter` 分别实现
-- **泛型**：`filter_notes` 函数接受任意 `Fn(&Note) -> bool` 闭包
-- **Result 错误处理**：所有可能失败的操作都返回 `Result`，用 `?` 传播错误
-- **模块化设计**：5 个模块各司其职，通过 `mod` 组织
+- **ownership / borrowing**：搜索和过滤那块大量用的引用，尽量不拷贝数据
+- **struct / enum**：Note、Metadata、Tag 是结构体，Command、ExportFormat、StorageError 是枚举
+- **trait**：Exportable trait 做导出接口，JsonExporter/HtmlExporter/TextExporter 分别实现
+- **泛型**：filter_notes 接受 Fn(&Note) -> bool 闭包，不限定具体类型
+- **Result**：所有可能炸的操作都返回 Result，用 ? 往上抛
+- **模块化**：5个 mod 各管各的
 
 ## 测试
 
 ```bash
-# 运行所有测试
-cargo test
-
-# 只运行单元测试
-cargo test --bin mdnote
-
-# 运行集成测试
-cargo test --test integration_test
+cargo test                        # 跑全部
+cargo test --bin mdnote           # 只跑单元测试
+cargo test --test integration_test  # 只跑集成测试
 ```
+
+46 个单元测试 + 4 个集成测试，都能过。
 
 ## 代码规范
 
 ```bash
-# 格式化代码
-cargo fmt
-
-# 静态检查
-cargo clippy
+cargo fmt    # 格式化
+cargo clippy # 静态检查，0 warning
 ```
 
 ## 许可证
